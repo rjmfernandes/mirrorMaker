@@ -1,0 +1,26 @@
+{
+    "name": "east-to-west-source",
+    "connector.class": "org.apache.kafka.connect.mirror.MirrorSourceConnector",
+    "tasks.max": "10",
+    "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+    "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+
+    
+    "source.cluster.alias": "east-kafka",
+    "target.cluster.alias": "west-kafka",
+    "source.cluster.bootstrap.servers": "broker1:9092",
+    "target.cluster.bootstrap.servers": "broker2:9092",
+
+    "replication.factor": "-1",
+    "offset-syncs.topic.replication.factor": "-1",
+
+    
+    "refresh.topics.interval.seconds": "10",
+    "sync.topic.configs.interval.seconds": "10",
+    "sync.topic.acls.enabled": "false", 
+    "replication.policy.class": 
+        "org.apache.kafka.connect.mirror.IdentityReplicationPolicy", 
+
+    
+    "topics": ".*"
+}
