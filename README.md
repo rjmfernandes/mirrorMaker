@@ -94,6 +94,71 @@ kafka-console-consumer --bootstrap-server localhost:9093 \
 
 Check how the messages you create on east kafka get replicated to west kafka.
 
+## MirrorCheckpointConnector - consumer applications
 
+We create a new connector:
 
+```bash
+curl -X PUT -H "Content-Type: application/json" \
+  -d @east-to-west-checkpoint.json \
+  localhost:8083/connectors/east-to-west-checkpoint/config
+```
 
+We can again double check the status of connector:
+
+```bash
+curl localhost:8084/connectors
+curl localhost:8084/connectors/east-to-west-checkpoint/status
+```
+
+We can now create a consumer group in the east (broker1):
+
+```bash
+kafka-console-consumer --bootstrap-server localhost:9092 \
+  --topic inventory --from-beginning \
+  --group my-group
+```
+
+If we list topics we can see the connector has created a topic east-kafka.checkpoints.internal with a single partition in the west/broker2 deployment:
+
+```bash
+kafka-topics --bootstrap-server localhost:9093 \
+  --list
+```
+
+If we run again against the east/broker1 in one shell:
+
+```bash
+kafka-console-producer --bootstrap-server localhost:9092 \
+  --topic inventory
+```
+
+And against the other also for the east/broker1:
+
+```bash
+kafka-console-consumer --bootstrap-server localhost:9092 \
+  --topic inventory --from-beginning \
+  --group my-group
+```
+
+We should see the new created messages show up  on the consumer.
+
+If we stop the last consumer and run the same now against the west/broker2:
+
+```bash
+kafka-console-consumer --bootstrap-server localhost:9093 \
+  --topic inventory --from-beginning \
+  --group my-group
+```
+
+For new created messages we should see it pop up on the consumer for the west/broker2 which picks up from the 
+last offset of eat/broker1.
+
+If you check offsets on each deployment they should match:
+
+```bash
+kafka-consumer-groups --bootstrap-server localhost:9092 \
+--describe --group my-group
+kafka-consumer-groups --bootstrap-server localhost:9093 \
+--describe --group my-group
+```

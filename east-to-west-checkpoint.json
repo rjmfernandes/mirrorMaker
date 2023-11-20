@@ -1,0 +1,22 @@
+{
+    "name": "east-to-west-checkpoint",
+    "connector.class": 
+        "org.apache.kafka.connect.mirror.MirrorCheckpointConnector",
+    "tasks.max": "10",
+    "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+    "value.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+
+    "source.cluster.alias": "east-kafka",
+    "target.cluster.alias": "west-kafka",
+    "source.cluster.bootstrap.servers": "broker1:9092",
+    "target.cluster.bootstrap.servers": "broker2:9092",
+
+    "checkpoints.topic.replication.factor": "-1",
+
+    "refresh.groups.interval.seconds": "10", 
+
+    "groups": ".*", 
+    "sync.group.offsets.enabled": "true", 
+    "replication.policy.class": 
+        "org.apache.kafka.connect.mirror.IdentityReplicationPolicy" 
+}
